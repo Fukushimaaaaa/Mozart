@@ -106,3 +106,6 @@ The aim of this project is to develop a sheet music reader. This is called Optic
 - [OpenCV](https://opencv.org/)
 - [scikit-learn](https://scikit-learn.org/stable/)
 - [scikit-image](https://scikit-image.org/)
+
+### Shakuhachi Tablature Prototype
+A proof-of-concept pipeline for vertical shakuhachi notation lives under `src/tablature/shakuhachi`. It reuses the existing preprocessing and classifier but applies a custom segmenter for vertical measures.

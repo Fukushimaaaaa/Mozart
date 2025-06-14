@@ -108,4 +108,8 @@ The aim of this project is to develop a sheet music reader. This is called Optic
 - [scikit-image](https://scikit-image.org/)
 
 ### Shakuhachi Tablature Prototype
-A proof-of-concept pipeline for vertical shakuhachi notation lives under `src/tablature/shakuhachi`. It reuses the existing preprocessing and classifier but applies a custom segmenter for vertical measures.
+A proof-of-concept pipeline for vertical shakuhachi notation lives under
+`src/tablature/shakuhachi`. It reuses the existing preprocessing and classifier
+but applies a custom segmenter for vertical measures. Configuration is handled
+via a small [Pydantic](https://docs.pydantic.dev/) model. See the README in that
+directory for training and usage instructions.

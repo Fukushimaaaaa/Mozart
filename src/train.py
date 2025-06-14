@@ -9,18 +9,21 @@ from sklearn import svm
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle
+from typing import Iterable, List, Tuple, Dict
 
-dataset_path = 'train_data/data'
+# Default dataset location. Individual training scripts can override this
+# by passing ``dataset_path`` to ``train``.
+DEFAULT_DATASET_PATH = 'train_data/data'
 target_img_size = (100, 100)
 sample_count = 50
 
 
-def extract_raw_pixels(img):
+def extract_raw_pixels(img: np.ndarray) -> np.ndarray:
     resized = cv2.resize(img, target_img_size)
     return resized.flatten()
 
 
-def extract_hsv_histogram(img):
+def extract_hsv_histogram(img: np.ndarray) -> np.ndarray:
     resized = cv2.resize(img, target_img_size)
     hsv = cv2.cvtColor(resized, cv2.COLOR_BGR2HSV)
     hist = cv2.calcHist([hsv], [0, 1, 2], None, [8, 8, 8],
@@ -32,7 +35,7 @@ def extract_hsv_histogram(img):
     return hist.flatten()
 
 
-def extract_hog_features(img):
+def extract_hog_features(img: np.ndarray) -> np.ndarray:
     img = cv2.resize(img, target_img_size)
     win_size = (100, 100)
     cell_size = (4, 4)
@@ -49,7 +52,7 @@ def extract_hog_features(img):
     return h.flatten()
 
 
-def extract_features(img, feature_set='raw'):
+def extract_features(img: np.ndarray, feature_set: str = 'raw') -> np.ndarray:
     if feature_set == 'hog':
         return extract_hog_features(img)
     elif feature_set == 'raw':
@@ -58,7 +61,9 @@ def extract_features(img, feature_set='raw'):
         return extract_hsv_histogram(img)
 
 
-def load_dataset(feature_set='raw', dir_names=[]):
+def load_dataset(feature_set: str = 'raw', dir_names: Iterable[str] | None = None, dataset_path: str = DEFAULT_DATASET_PATH) -> Tuple[List[np.ndarray], List[str]]:
+    if dir_names is None:
+        dir_names = []
     features = []
     labels = []
     count = 0
@@ -75,7 +80,7 @@ def load_dataset(feature_set='raw', dir_names=[]):
     return features, labels
 
 
-def load_classifiers():
+def load_classifiers() -> Tuple[Dict[str, object], int]:
     random_seed = 42
     random.seed(random_seed)
     np.random.seed(random_seed)
@@ -93,9 +98,9 @@ def load_classifiers():
     return classifiers, random_seed
 
 
-def run_experiment(classifier='SVM', feature_set='hog', dir_names=[]):
+def run_experiment(classifier: str = 'SVM', feature_set: str = 'hog', dir_names: Iterable[str] | None = None, dataset_path: str = DEFAULT_DATASET_PATH) -> Tuple[object, float]:
     print('Loading dataset. This will take time ...')
-    features, labels = load_dataset(feature_set, dir_names)
+    features, labels = load_dataset(feature_set, dir_names, dataset_path)
     print('Finished loading dataset.')
 
     classifiers, random_seed = load_classifiers()
@@ -112,10 +117,10 @@ def run_experiment(classifier='SVM', feature_set='hog', dir_names=[]):
     return model, accuracy
 
 
-def train(model_name, feature_name, saved_model_name):
+def train(model_name: str, feature_name: str, saved_model_name: str, dataset_path: str = DEFAULT_DATASET_PATH) -> None:
     dir_names = [path.split('/')[2] for path in glob(f'{dataset_path}/*')]
 
-    model, accuracy = run_experiment(model_name, feature_name, dir_names)
+    model, accuracy = run_experiment(model_name, feature_name, dir_names, dataset_path)
 
     filename = f'trained_models/{saved_model_name}.sav'
     pickle.dump(model, open(filename, 'wb'))
@@ -123,3 +128,4 @@ def train(model_name, feature_name, saved_model_name):
 
 if __name__ == "__main__":
     train('NN', 'hog', 'nn_trained_model_hog')
+

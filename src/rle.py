@@ -3,7 +3,9 @@ import numpy as np
 
 def rle_encode(arr):
     if len(arr) == 0:
-        return [], [], []
+        # keep the return format consistent with the non-empty case
+        # which returns two arrays: lengths and values
+        return [], []
 
     x = np.copy(arr)
     first_dismatch = np.array(x[1:] != x[:-1])
